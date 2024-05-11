@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import gamma
+from mpl_toolkits.mplot3d import Axes3D
 
 # data list
 tau_file = open('coal-mine.csv', "r")
@@ -57,62 +58,69 @@ for k in range(1,N+1):
         
 
 # Question d
-# We suppose d=1
+d=2
 
 # Posteriors
-def prop_post_theta(theta, lambda1):
-    return theta*np.exp(-theta*(lambda1 + nu))
+def prop_post_theta(theta, lambda_list, nu):
+    return theta**(2*d+1)*np.exp(-theta*(np.sum(lambda_list) + nu))
     
-
-def post_lambda(lambda1, theta, t):
+def prop_post_lambda(lambda_list, theta, t, nu):
+    diff = np.diff(t)
+    if np.any(diff <= 0):
+        return 0
     ans = 1
     for i in range(d):
-        ans *= lambda1**(countau(tau, t[i], t[i+1]) + 1)
+        ans *= lambda_list[i]**(countau(tau, t[i], t[i+1]) + 1)
     for i in range(d):
-        ans *= np.exp(-lambda1(t[i+1]-t[i]+theta))
-    return ans
+        ans *= np.exp(-lambda_list[i]*(t[i+1]-t[i]+theta))
+    return ans*(nu**2)*np.exp(-nu*theta)
 
-def post_t(t, lambda1):
+def prop_post_t(lambda_list, theta, t_value, nu):
+    t = np.array([1851, t_value, 1963])
     ans = 1
     for i in range(d):
         ans *= t[i+1]-t[i]
     for i in range(d):
-        ans *= np.exp(-lambda1*(t[i+1]-t[i]))
+        ans *= np.exp(-lambda_list[i]*(t[i+1]-t[i]))
     for i in range(d):
-        ans *= lambda1**countau(tau, t[i], t[i+1])
-    return ans
+        ans *= lambda_list[i]**countau(tau, t[i], t[i+1])
+    return ans*(nu**2)*np.exp(-nu*theta)
+
 
 # Plotting
 theta_space = np.linspace(0.5, 15, 50)
 lambda_1_space = np.linspace(0.5, 15, 50)
-t_space = np.linspace(1851, 1963, 50)
+lambda_2_space = np.linspace(0.5, 15, 50)
+t_space = np.linspace(1852, 1962, 50)
 
-theta_example = 5
-lambda_example = 5
-t_example = (1963-1851)/2
+theta_ex = 5
+lambda_ex = 5
+t_ex = np.array([1851,1900,1963])
+
+nu_list = np.array([1/5,1/3,1/2,1])
 
 # post theta plot
-plt.figure(1)
-plt.plot(theta_space, [post_theta(theta_, lambda_example) for theta_ in theta_space])
-plt.title("Posterior of theta plot")
-plt.ylabel("posterior")
-plt.xlabel("theta")
+fig, ax = plt.subplots(2, 2)
+for i in range(2):
+    for j in range(2):
+        ax[i,j].plot(theta_space, prop_post_theta(theta_space, lambda_ex*np.ones(d), nu_list[2*i+j]))
+        ax[i,j].set_title("Posterior of theta plot with nu = " + str(nu_list[2*i+j]))
 plt.show()
 
 # post lambda plot
-plt.figure(1)
-plt.plot(theta_space, [post_lambda(theta, lambda_example) for theta_ in theta_space])
-plt.title("Posterior of theta plot")
-plt.ylabel("posterior")
-plt.xlabel("theta")
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+lambda_1_space, lambda_2_space = np.meshgrid(lambda_1_space, lambda_2_space)
+post_lambda = prop_post_lambda([lambda_1_space, lambda_2_space], theta_ex, t_ex, nu_list[3])
+ax.plot_surface(lambda_1_space, lambda_2_space, post_lambda, cmap='viridis')
+ax.set_xlabel('Lambda 1')
+ax.set_ylabel('Lambda 2')
 plt.show()
 
-# post theta
-
 # post t plot
-plt.figure(1)
-plt.plot(theta_space, [post_theta(theta_, lambda_example) for theta_ in theta_space])
-plt.title("Posterior of theta plot")
-plt.ylabel("posterior")
-plt.xlabel("theta")
+fig, ax = plt.subplots(2, 2)
+for i in range(2):
+    for j in range(2):
+        ax[i,j].plot(t_space, np.array([prop_post_t(lambda_ex*np.ones(d), theta_ex, t, nu_list[2*i+j]) for t in t_space]))
+    
 plt.show()
