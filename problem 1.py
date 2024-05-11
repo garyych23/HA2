@@ -17,8 +17,7 @@ rho = 1
 # Initialization : k = 0
 teta = np.random.gamma(2, nu)
 lambdas = np.ones(d)
-t = np.linspace(tau[0], tau[-1], d+1)
-t[0], t[-1] = 1851, 1963 # t[0] = t_1
+t = np.linspace(1851, 1963, d+1) # t[0] = t_1
 for k in range(1,M):
     # Gibbs : teta, lambda
     teta = np.random.gamma(2, sum(lambdas) + nu)
