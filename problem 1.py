@@ -35,21 +35,22 @@ for k in range(1,N+1):
         lambda_list[i] = np.random.gamma(n_i + 2, t_list[i+1] - t_list[i] + theta)
     # Metropolis-Hastings with Random walk proposal: t
     diff = np.diff(t_list)
-    i=1
-    while (not np.any(diff <= 0)) and (i < d): # 
-        #for i in range(1,d): # first and last time points are fixed
+    for i in range(1,d): # first and last time points are fixed
         R = rho*(t_list[i+1] - t_list[i-1])
         eps = np.random.rand()*2*R - R
         t_star = t_list[i] + eps
         print("t_star:", t_star)
-        ratio = ((t_list[i+1]-t_star)*(t_star-t_list[i-1]))/((t_list[i+1]-t_list[i])*(t_list[i]-t_list[i-1]))\
-        * np.exp((lambda_list[i]-lambda_list[i-1])*(t_star-t_list[i]))\
-        * lambda_list[i-1]**(countau(tau,t_list[i-1],t_star)-countau(tau,t_list[i-1],t_list[i]))\
-        * lambda_list[i]**(countau(tau,t_star,t_list[i+1])-countau(tau,t_list[i],t_list[i+1]))
+        diff = np.diff(t_list)
+        if  np.any(diff <= 0):
+            ratio = 0
+        else:
+            ratio = ((t_list[i+1]-t_star)*(t_star-t_list[i-1]))/((t_list[i+1]-t_list[i])*(t_list[i]-t_list[i-1]))\
+            * np.exp((lambda_list[i]-lambda_list[i-1])*(t_star-t_list[i]))\
+            * lambda_list[i-1]**(countau(tau,t_list[i-1],t_star)-countau(tau,t_list[i-1],t_list[i]))\
+            * lambda_list[i]**(countau(tau,t_star,t_list[i+1])-countau(tau,t_list[i],t_list[i+1]))
         alpha = np.min([1,ratio])
         U = np.random.rand()
         if U <= alpha:
             t_list[i] = t_star
-        i += 1
         
         
