@@ -9,7 +9,7 @@ for l in tau_file:
 # Question b
 
 # Hyperparameters
-M = 100 # MC size
+M = 1000 # MC size
 d = 2 # Number of break points - 1
 nu = 1 # Hyperparameter of teta
 rho = 1
