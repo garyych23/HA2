@@ -26,7 +26,7 @@ def countau(tau,t1,t2):
 theta = np.random.gamma(2, nu)
 lambda_list = np.random.gamma(2, theta, d)
 t_list = np.linspace(1851, 1963, d+1) 
-for k in range(1,N):
+for k in range(1,N+1):
     print("Current k=", k)
     # Gibbs : teta, lambda
     theta = np.random.gamma(2, np.sum(lambda_list) + nu)
