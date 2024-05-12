@@ -13,7 +13,7 @@ Sigma = np.diag([5, 0.5])
 Sigma_inv = np.diag([0.2, 2])
 
 # Hyperparameters
-N = 1000
+N = 10000
 sig = 2
 #
 
