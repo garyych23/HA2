@@ -77,13 +77,13 @@ def mcmc(d, nu, rho):
 # # Question c
 d_list = [2, 3, 4, 5]
 nu = 1
-rho = 1/2
+rho = 1/10
 
 fig,ax = plt.subplots(nrows=2, ncols=2,figsize=(8, 8))
 for i in range(2):
     for j in range(2):
-        ax[i][j].set_title(f'Evolution of $\\Theta$ for d = {d_list[2*i+j]}')
-        ax[i][j].plot(mcmc(d_list[2*i+j], nu, rho)[0])
+        ax[i][j].set_title(f'd = {d_list[2*i+j]}')
+        ax[i][j].plot(mcmc(d_list[2*i+j], nu, rho)[0], label = '$\\theta$')
         ax[i][j].legend()
         ax[i][j].grid()
 plt.show()
@@ -91,8 +91,8 @@ plt.show()
 fig,ax = plt.subplots(nrows=2, ncols=2,figsize=(8, 8))
 for i in range(2):
     for j in range(2):
-        ax[i][j].set_title(f'Histogram of $\\Theta$ for d = {d_list[2*i+j]}')
-        ax[i][j].hist(mcmc(d_list[2*i+j], nu, rho)[0],100,linewidth=1)
+        ax[i][j].set_title(f'd = {d_list[2*i+j]}')
+        ax[i][j].hist(mcmc(d_list[2*i+j], nu, rho)[0],100,linewidth=1, label = '$\\theta$')
         ax[i][j].legend()
         ax[i][j].grid()
 plt.show()
@@ -100,7 +100,7 @@ plt.show()
 fig,ax = plt.subplots(nrows=2, ncols=2,figsize=(8, 8))
 for i in range(2):
     for j in range(2):
-        ax[i][j].set_title('Evolution of $(\\lambda)_{l=1}^{d}$' + f'for d = {d_list[2*i+j]}')
+        ax[i][j].set_title(f'd = {d_list[2*i+j]}')
         for k in range(d_list[2*i+j]):
             ax[i][j].plot(mcmc(d_list[2*i+j], nu, rho)[1][:,k], label=f'$\\lambda_{k+1}$')
         ax[i][j].legend()
@@ -110,7 +110,7 @@ plt.show()
 fig,ax = plt.subplots(nrows=2, ncols=2,figsize=(8, 8))
 for i in range(2):
     for j in range(2):
-        ax[i][j].set_title('Histogram of $(\\lambda)_{l=1}^{d})$ '+ f'for d = {d_list[2*i+j]}')
+        ax[i][j].set_title(f'd = {d_list[2*i+j]}')
         for k in range(d_list[2*i+j]):
             ax[i][j].hist(mcmc(d_list[2*i+j], nu, rho)[1][:,k], 100, linewidth=1, label=f'$\\lambda_{k+1}$')
         ax[i][j].legend()
@@ -120,7 +120,7 @@ plt.show()
 fig,ax = plt.subplots(nrows=2, ncols=2,figsize=(8, 8))
 for i in range(2):
     for j in range(2):
-        ax[i][j].set_title('Evolution of $(t)_{l=2}^{d})$' + f'for d = {d_list[2*i+j]}')
+        ax[i][j].set_title(f'd = {d_list[2*i+j]}')
         for k in range(1,d_list[2*i+j]):
             ax[i][j].plot(mcmc(d_list[2*i+j], nu, rho)[2][:,k], label=f'$t_{k+1}$')
         ax[i][j].legend()
@@ -130,7 +130,7 @@ plt.show()
 fig,ax = plt.subplots(nrows=2, ncols=2,figsize=(8, 8))
 for i in range(2):
     for j in range(2):
-        ax[i][j].set_title('Histogram of $(t)_{l=2}^{d})$' + f'for d = {d_list[2*i+j]}')
+        ax[i][j].set_title(f'd = {d_list[2*i+j]}')
         for k in range(1,d_list[2*i+j]):
             ax[i][j].hist(mcmc(d_list[2*i+j], nu, rho)[2][:,k],100, linewidth=1, label=f'$t_{k+1}$')
         ax[i][j].legend()
@@ -140,13 +140,13 @@ plt.show()
 # Question d
 nu_list = [1/10, 1, 5, 10]
 d = 3
-rho = 1/2
+rho = 1/10
 
 fig,ax = plt.subplots(nrows=2, ncols=2,figsize=(8, 8))
 for i in range(2):
     for j in range(2):
-        ax[i][j].set_title(f'Histogram of $\\Theta$ for $\\nu$ = {nu_list[2*i+j]}')
-        ax[i][j].hist(mcmc(d, nu_list[2*i+j], rho)[0],100,linewidth=1)
+        ax[i][j].set_title(f'$\\nu$ = {nu_list[2*i+j]}')
+        ax[i][j].hist(mcmc(d, nu_list[2*i+j], rho)[0],100,linewidth=1,label = '$\\theta$')
         ax[i][j].legend()
         ax[i][j].grid()
 plt.show()
@@ -154,7 +154,7 @@ plt.show()
 fig,ax = plt.subplots(nrows=2, ncols=2,figsize=(8, 8))
 for i in range(2):
     for j in range(2):
-        ax[i][j].set_title('Histogram of $(\\lambda)_{l=1}^{3})$ '+ f'for $\\nu$ = {nu_list[2*i+j]}')
+        ax[i][j].set_title(f'$\\nu$ = {nu_list[2*i+j]}')
         for k in range(3):
             ax[i][j].hist(mcmc(d, nu_list[2*i+j], rho)[1][:,k], 100, linewidth=1, label=f'$\\lambda_{k+1}$')
         ax[i][j].legend()
@@ -164,7 +164,7 @@ plt.show()
 fig,ax = plt.subplots(nrows=2, ncols=2,figsize=(8, 8))
 for i in range(2):
     for j in range(2):
-        ax[i][j].set_title('Histogram of $(t)_{l=2}^{3})$' + f'for $\\nu$ = {nu_list[2*i+j]}')
+        ax[i][j].set_title(f'$\\nu$ = {nu_list[2*i+j]}')
         for k in range(1,3):
             ax[i][j].hist(mcmc(d, nu_list[2*i+j], rho)[2][:,k],100, linewidth=1, label=f'$t_{k+1}$')
         ax[i][j].legend()
@@ -179,8 +179,8 @@ nu = 1
 fig,ax = plt.subplots(nrows=2, ncols=2,figsize=(8, 8))
 for i in range(2):
     for j in range(2):
-        ax[i][j].set_title(f'Histogram of $\\Theta$ for $\\rho$ = {rho_list[2*i+j]}')
-        ax[i][j].hist(mcmc(d, nu, rho_list[2*i+j])[0],100,linewidth=1)
+        ax[i][j].set_title(f'$\\rho$ = {rho_list[2*i+j]}')
+        ax[i][j].hist(mcmc(d, nu, rho_list[2*i+j])[0],100,linewidth=1,label = '$\\theta$')
         ax[i][j].legend()
         ax[i][j].grid()
 plt.show()
@@ -188,7 +188,7 @@ plt.show()
 fig,ax = plt.subplots(nrows=2, ncols=2,figsize=(8, 8))
 for i in range(2):
     for j in range(2):
-        ax[i][j].set_title('Histogram of $(\\lambda)_{l=1}^{3})$ '+ f'for $\\rho$ = {rho_list[2*i+j]}')
+        ax[i][j].set_title(f'$\\rho$ = {rho_list[2*i+j]}')
         for k in range(3):
             ax[i][j].hist(mcmc(d, nu, rho_list[2*i+j])[1][:,k], 100, linewidth=1, label=f'$\\lambda_{k+1}$')
         ax[i][j].legend()
@@ -198,7 +198,7 @@ plt.show()
 fig,ax = plt.subplots(nrows=2, ncols=2,figsize=(8, 8))
 for i in range(2):
     for j in range(2):
-        ax[i][j].set_title('Histogram of $(t)_{l=2}^{3})$' + f'for $\\rho$ = {rho_list[2*i+j]}')
+        ax[i][j].set_title(f'$\\rho$ = {rho_list[2*i+j]}')
         for k in range(1,3):
             ax[i][j].hist(mcmc(d, nu, rho_list[2*i+j])[2][:,k],100, linewidth=1, label=f'$t_{k+1}$')
         ax[i][j].legend()
