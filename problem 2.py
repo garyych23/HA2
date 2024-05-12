@@ -29,17 +29,18 @@ def H(th, v):
 
 
 def leapfrog(th, v, L, eps):
-    coeff = (2/(sig**2))*sum(y) - ((2*n*(np.linalg.norm(th)**2))/(sig**2))
-    grad_0 = coeff - Sigma_inv[0,0]
-    grad_1 = coeff - Sigma_inv[1,1]
-    grad_U = -np.array([grad_0*th[0], grad_1*th[1]])
+    def grad_U(th):
+        coeff = (2/(sig**2))*sum(y) - ((2*n*(np.linalg.norm(th)**2))/(sig**2))
+        grad_0 = coeff - Sigma_inv[0,0]
+        grad_1 = coeff - Sigma_inv[1,1]
+        return -np.array([grad_0*th[0], grad_1*th[1]])
     theta_T = th
-    v_T = v - 0.5*eps*grad_U
+    v_T = v - 0.5*eps*grad_U(theta_T)
     for m in range(1,L+1):
         theta_T = theta_T + eps*v_T
         if m != L:
-            v_T = v_T - eps*grad_U
-    v_T = v_T - 0.5*eps*grad_U
+            v_T = v_T - eps*grad_U(theta_T)
+    v_T = v_T - 0.5*eps*grad_U(theta_T)
     v_T = - v_T
     return theta_T, v_T
 
