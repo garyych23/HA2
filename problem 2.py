@@ -13,12 +13,12 @@ Sigma = np.diag([5, 0.5])
 Sigma_inv = np.diag([0.2, 2])
 
 # Hyperparameters
-N = 10000
+N = 1000
 sig = 2
 #
 
 def H(th, v):
-    K = 0.5*np.linalg.norm(v)**2
+    K = 0.5*(np.linalg.norm(v)**2)
     s = 0
     for i in range(n):
         s += (y[i] - (np.linalg.norm(th)**2))**2
@@ -83,20 +83,20 @@ def mh(zeta):
             theta[i] = theta[i-1]
     return theta, acceptance_rate/N
 
-# theta_hmc, acceptace_rate_hmc = hmc(L=25, eps=0.25)
-theta_mh, acceptace_rate_mh = mh(zeta=1)
+theta_hmc, acceptace_rate_hmc = hmc(L=25, eps=0.25)
+# theta_mh, acceptace_rate_mh = mh(zeta=1)
 
 # plt.figure()
 # plt.hist2d(theta_hmc[:,0], theta_hmc[:,1], (100, 100))
 # plt.show()
 
-plt.figure()
-plt.hist2d(theta_mh[:,0], theta_mh[:,1], (100, 100))
-plt.show()
+# plt.figure()
+# plt.hist2d(theta_mh[:,0], theta_mh[:,1], (100, 100))
+# plt.show()
 
-# print("\nHMC")
-# print("theta=", theta_hmc[N-1])
-# print("acceptance_rate=", acceptace_rate_hmc)
+print("\nHMC")
+print("theta=", theta_hmc[N-1])
+print("acceptance_rate=", acceptace_rate_hmc)
 
 # print("\nMH")
 # print("theta=", theta_mh[N-1])
