@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import gamma
-from mpl_toolkits.mplot3d import Axes3D
 
 # data list
 tau_file = open('coal-mine.csv', "r")
@@ -10,12 +9,14 @@ for l in tau_file:
     tau.append(float(l))
 tau = np.array(tau)
 n = len(tau)
+
 # Question b
+print("Question b")
 
 # Hyperparameters
 N = 1000 # MC size
-d = 2 # Number of break points - 1
-nu = 1/5 # Hyperparameter of teta
+d = 3 # Number of break points - 1
+nu = 1 # Hyperparameter of teta
 rho = 1/2
 
 def countau(tau,t1,t2):
@@ -26,23 +27,36 @@ def countau(tau,t1,t2):
     return float(count)
 
 # Initialization : k = 0
-theta = np.random.gamma(2*d+2, nu)
-lambda_list = np.random.gamma(2, theta, d)
-t_list = np.linspace(1851, 1963, d+1) 
+theta = np.random.gamma(2*d+2, 1/nu) # scale = 1/rate
+lambda_list = np.random.gamma(2, 1/theta, d)
+t_list = np.linspace(1851, 1963, d+1)
+accept_rate_t = np.zeros((d-1, 1))
+
+# For plotting (Question c)
+theta_list = np.zeros((N+1, 1))
+lambda_matrix = np.zeros((N+1, d))
+t_matrix = np.zeros((N+1, d+1))
+
+theta_list[0] = theta
+lambda_matrix[0,:] = lambda_list
+t_matrix[0,:] = t_list
+#
+
 for k in range(1,N+1):
     print("Current k=", k)
     # Gibbs : teta, lambda
-    theta = np.random.gamma(2*d+2, np.sum(lambda_list) + nu)
+    theta = np.random.gamma(2*d+2, 1/(np.sum(lambda_list) + nu))
+    theta_list[k] = theta # for plotting (Question c)
     for i in range(d):
         n_i = countau(tau, t_list[i], t_list[i+1])
-        lambda_list[i] = np.random.gamma(n_i + 2, t_list[i+1] - t_list[i] + theta)
+        lambda_list[i] = np.random.gamma(n_i + 2, 1/(t_list[i+1] - t_list[i] + theta))
+    lambda_matrix[k,:] = lambda_list # for plotting (Question c)
     # Metropolis-Hastings with Random walk proposal: t
     diff = np.diff(t_list)
     for i in range(1,d): # first and last time points are fixed
         R = rho*(t_list[i+1] - t_list[i-1])
         eps = np.random.rand()*2*R - R
         t_star = t_list[i] + eps
-        print("t_star:", t_star)
         diff = np.diff(t_list)
         if  np.any(diff <= 0):
             ratio = 0
@@ -55,72 +69,82 @@ for k in range(1,N+1):
         U = np.random.rand()
         if U <= alpha:
             t_list[i] = t_star
-        
+            accept_rate_t[i-1] += 1
+    t_matrix[k,:] = t_list # for plotting (Question c)
+accept_rate_t = accept_rate_t/N
+    
+# Question c
+print("\nQuestion c")
+
+fig = plt.figure()
+ax = fig.subplots()
+ax.plot(theta_list)
+ax.set_title("$\\theta$ plot for d = " + str(d))
+ax.set_xlabel("$k$")
+ax.set_ylabel("$\\theta$")
+ax.grid()
+plt.show()
+
+fig = plt.figure()
+ax = fig.subplots()
+for i in range(d):
+    ax.plot(lambda_matrix[:,i], label=f"$\\lambda_{i+1}$")
+ax.set_title("$\\lambda$ plot for d = " + str(d))
+ax.set_xlabel("$k$")
+ax.set_ylabel("$\\lambda_i$")
+ax.grid()
+ax.legend()
+plt.show()
+
+fig = plt.figure()
+ax = fig.subplots()
+for i in range(1,d):
+    ax.plot(t_matrix[:,i], label=f"$t_{i+1}$")
+ax.set_title(f"$t$ plot for d = " + str(d))
+ax.set_xlabel("$k$")
+ax.set_ylabel(f"$t_i$")
+ax.grid()
+ax.legend()
+plt.show()
+
+fig = plt.figure()
+ax = fig.subplots()
+ax.hist(theta_list, 100)
+ax.set_title("$\\theta$ hist for d = " + str(d))
+ax.grid()
+plt.show()
+
+fig = plt.figure()
+ax = fig.subplots()
+for i in range(d):
+    ax.hist(lambda_matrix[:,i], 100, label=f"$\\lambda_{i+1}$")
+ax.set_title("$\\lambda$ hist for d = " + str(d))
+ax.grid()
+ax.legend()
+plt.show()
+
+fig = plt.figure()
+ax = fig.subplots()
+for i in range(1,d):
+    ax.hist(t_matrix[:,i], 50, label=f"$t_{i+1}$")
+ax.set_title(f"$t$ hist for d = " + str(d))
+ax.grid()
+ax.legend()
+plt.show()
 
 # Question d
-d=2
+# test with several values of nu
+print("\nQuestion d")
+print("For nu =", nu)
+print("theta =", theta)
+print("lambda =", lambda_list)
+print("breakpoints =", t_list[1:d])
 
-# Posteriors
-def prop_post_theta(theta, lambda_list, nu):
-    return theta**(2*d+1)*np.exp(-theta*(np.sum(lambda_list) + nu))
-    
-def prop_post_lambda(lambda_list, theta, t, nu):
-    diff = np.diff(t)
-    if np.any(diff <= 0):
-        return 0
-    ans = 1
-    for i in range(d):
-        ans *= lambda_list[i]**(countau(tau, t[i], t[i+1]) + 1)
-    for i in range(d):
-        ans *= np.exp(-lambda_list[i]*(t[i+1]-t[i]+theta))
-    return ans*(nu**2)*np.exp(-nu*theta)
-
-def prop_post_t(lambda_list, theta, t_value, nu):
-    t = np.array([1851, t_value, 1963])
-    ans = 1
-    for i in range(d):
-        ans *= t[i+1]-t[i]
-    for i in range(d):
-        ans *= np.exp(-lambda_list[i]*(t[i+1]-t[i]))
-    for i in range(d):
-        ans *= lambda_list[i]**countau(tau, t[i], t[i+1])
-    return ans*(nu**2)*np.exp(-nu*theta)
-
-
-# Plotting
-theta_space = np.linspace(0.5, 15, 50)
-lambda_1_space = np.linspace(0.5, 15, 50)
-lambda_2_space = np.linspace(0.5, 15, 50)
-t_space = np.linspace(1852, 1962, 50)
-
-theta_ex = 5
-lambda_ex = 5
-t_ex = np.array([1851,1900,1963])
-
-nu_list = np.array([1/5,1/3,1/2,1])
-
-# post theta plot
-fig, ax = plt.subplots(2, 2)
-for i in range(2):
-    for j in range(2):
-        ax[i,j].plot(theta_space, prop_post_theta(theta_space, lambda_ex*np.ones(d), nu_list[2*i+j]))
-        ax[i,j].set_title("Posterior of theta plot with nu = " + str(nu_list[2*i+j]))
-plt.show()
-
-# post lambda plot
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-lambda_1_space, lambda_2_space = np.meshgrid(lambda_1_space, lambda_2_space)
-post_lambda = prop_post_lambda([lambda_1_space, lambda_2_space], theta_ex, t_ex, nu_list[3])
-ax.plot_surface(lambda_1_space, lambda_2_space, post_lambda, cmap='viridis')
-ax.set_xlabel('Lambda 1')
-ax.set_ylabel('Lambda 2')
-plt.show()
-
-# post t plot
-fig, ax = plt.subplots(2, 2)
-for i in range(2):
-    for j in range(2):
-        ax[i,j].plot(t_space, np.array([prop_post_t(lambda_ex*np.ones(d), theta_ex, t, nu_list[2*i+j]) for t in t_space]))
-    
-plt.show()
+# Question e
+# test with several values of rho
+print("\nQuestion e")
+print("For rho =", rho)
+print("theta =", theta)
+print("lambda =", lambda_list)
+print("breakpoints =", t_list[1:d])
+print("Acceptance rate of t = ", accept_rate_t)
