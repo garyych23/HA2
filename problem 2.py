@@ -1,5 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from statsmodels.graphics import tsaplots
+import matplotlib.pyplot as plt
+
+
 
 # data list
 hmc_file = open('hmc-observations.csv', "r")
@@ -37,6 +41,7 @@ def leapfrog(th, v, L, eps):
     theta_T = th
     v_T = v - 0.5*eps*grad_U(theta_T)
     for m in range(1,L+1):
+        # print("grad_U", grad_U(theta_T))
         theta_T = theta_T + eps*v_T
         if m != L:
             v_T = v_T - eps*grad_U(theta_T)
@@ -84,8 +89,8 @@ def mh(zeta):
             theta[i] = theta[i-1]
     return theta, acceptance_rate/N
 
-theta_hmc, acceptace_rate_hmc = hmc(L=25, eps=0.25)
-# theta_mh, acceptace_rate_mh = mh(zeta=1)
+# theta_hmc, acceptace_rate_hmc = hmc(L=25, eps=0.25)
+theta_mh, acceptace_rate_mh = mh(zeta=0.001)
 
 # plt.figure()
 # plt.hist2d(theta_hmc[:,0], theta_hmc[:,1], (100, 100))
@@ -95,10 +100,16 @@ theta_hmc, acceptace_rate_hmc = hmc(L=25, eps=0.25)
 # plt.hist2d(theta_mh[:,0], theta_mh[:,1], (100, 100))
 # plt.show()
 
-print("\nHMC")
-print("theta=", theta_hmc[N-1])
-print("acceptance_rate=", acceptace_rate_hmc)
+# print("\nHMC")
+# print("theta=", theta_hmc[N-1])
+# print("acceptance_rate=", acceptace_rate_hmc)
 
-# print("\nMH")
-# print("theta=", theta_mh[N-1])
-# print("acceptance_rate=", acceptace_rate_mh)
+print("\nMH")
+print("theta=", theta_mh[N-1])
+print("acceptance_rate=", acceptace_rate_mh)
+
+#plot autocorrelation function
+fig = tsaplots.plot_acf(theta_mh[:,0], lags=1000)
+plt.show()
+fig = tsaplots.plot_acf(theta_mh[:,1], lags=1000)
+plt.show()
