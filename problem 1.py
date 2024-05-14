@@ -74,7 +74,7 @@ def mcmc(d, nu, rho):
     t_matrix = t_matrix[burn_in+1:,:]
     return theta_list, lambda_matrix, t_matrix, accept_rate_t
 
-# # Question c
+# Question c
 d_list = [2, 3, 4, 5]
 nu = 1
 rho = 1/10
